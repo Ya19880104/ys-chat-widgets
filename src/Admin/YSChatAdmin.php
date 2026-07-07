@@ -28,31 +28,18 @@ class YSChatAdmin {
     /**
      * 註冊選單
      *
-     * 優先掛載到 ys-toolbox 子選單；若不存在則建立頂層選單
+     * 獨立頂層選單（user 指定：不掛 YS Plugin 下，選單名 SUPPORT CHAT）
      */
     public function register_menu(): void {
-        $parent_slug = menu_page_url( 'ys-toolbox', false ) ? 'ys-toolbox' : null;
-
-        if ( $parent_slug ) {
-            add_submenu_page(
-                'ys-toolbox',
-                __( 'YS CHAT Widgets', 'ys-chat-widgets' ),
-                __( 'YS CHAT Widgets', 'ys-chat-widgets' ),
-                'manage_options',
-                self::PAGE_SLUG,
-                [ $this, 'render_page' ]
-            );
-        } else {
-            add_menu_page(
-                __( 'YS CHAT Widgets', 'ys-chat-widgets' ),
-                __( 'YS CHAT Widgets', 'ys-chat-widgets' ),
-                'manage_options',
-                self::PAGE_SLUG,
-                [ $this, 'render_page' ],
-                'dashicons-format-chat',
-                58
-            );
-        }
+        add_menu_page(
+            __( 'YS CHAT Widgets', 'ys-chat-widgets' ),
+            __( 'SUPPORT CHAT', 'ys-chat-widgets' ),
+            'manage_options',
+            self::PAGE_SLUG,
+            [ $this, 'render_page' ],
+            'dashicons-format-chat',
+            58
+        );
     }
 
     /**
