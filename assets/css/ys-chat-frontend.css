@@ -149,11 +149,20 @@
     display: block;
 }
 
-.ysch-toggle-img img {
+/* cover：圖佔滿整圓（適合本身就是完整圓形的圖） */
+.ysch-toggle-img.ysch-icon-cover img {
     width: 56px;
     height: 56px;
     border-radius: 50%;
     object-fit: cover;
+    display: block;
+}
+
+/* contain（預設）：保留按鈕底色，圖縮 60% 置中（適合去背 icon） */
+.ysch-toggle-img.ysch-icon-contain img {
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
     display: block;
 }
 
@@ -175,7 +184,7 @@
 /* ── 手機微調 ─────────────────────────────── */
 @media (max-width: 480px) {
     .ysch-toggle { width: 52px; height: 52px; }
-    .ysch-toggle-img img { width: 52px; height: 52px; }
+    .ysch-toggle-img.ysch-icon-cover img { width: 52px; height: 52px; }
     .ysch-icon { width: 44px; height: 44px; }
     .ysch-label { font-size: 12px; max-width: 180px; }
 }

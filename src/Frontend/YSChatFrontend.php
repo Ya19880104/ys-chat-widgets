@@ -197,7 +197,8 @@ class YSChatFrontend {
     <button type="button" class="ysch-toggle" aria-expanded="false" aria-controls="ys-chat-widgets"
             aria-label="<?php echo esc_attr__( '開啟聯絡選單', 'ys-chat-widgets' ); ?>">
         <?php if ( $btn_icon ) : ?>
-            <span class="ysch-toggle-open ysch-toggle-img"><img src="<?php echo esc_url( $btn_icon ); ?>" alt="" loading="lazy" /></span>
+            <?php $icon_style = ( 'cover' === ( $settings['icon_style'] ?? 'contain' ) ) ? 'cover' : 'contain'; ?>
+            <span class="ysch-toggle-open ysch-toggle-img ysch-icon-<?php echo esc_attr( $icon_style ); ?>"><img src="<?php echo esc_url( $btn_icon ); ?>" alt="" loading="lazy" /></span>
         <?php else : ?>
             <span class="ysch-toggle-open"><?php echo YSChatApps::toggle_icon(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
         <?php endif; ?>

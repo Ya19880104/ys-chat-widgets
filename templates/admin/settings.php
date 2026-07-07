@@ -115,6 +115,14 @@ $ysch_apps_defs = YSChatApps::all();
             </div>
             <p class="description"><?php echo esc_html__( '留空使用內建聊天圖示。', 'ys-chat-widgets' ); ?></p>
         </div>
+
+        <div class="ysch-field" id="ysch-icon-style-wrap">
+            <label><?php echo esc_html__( '自訂圖示顯示方式', 'ys-chat-widgets' ); ?></label>
+            <select id="ysch-icon-style">
+                <option value="contain" <?php selected( 'cover' !== ( $settings['icon_style'] ?? 'contain' ) ); ?>><?php echo esc_html__( '置中縮放（保留按鈕底色，適合去背 icon）', 'ys-chat-widgets' ); ?></option>
+                <option value="cover" <?php selected( 'cover' === ( $settings['icon_style'] ?? 'contain' ) ); ?>><?php echo esc_html__( '佔滿整圓（適合完整圓形圖片）', 'ys-chat-widgets' ); ?></option>
+            </select>
+        </div>
     </div>
 
     <!-- Apps 管理 -->

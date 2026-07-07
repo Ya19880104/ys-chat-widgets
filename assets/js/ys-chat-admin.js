@@ -172,6 +172,7 @@
             side:          parseInt( $( '#ysch-side' ).val(), 10 ) || 0,
             button_color:  $( '#ysch-button-color' ).val() || '',
             button_icon:   $( '#ysch-button-icon' ).val() || '',
+            icon_style:    $( '#ysch-icon-style' ).val() || 'contain',
             show_desktop:  $( '#ysch-show-desktop' ).is( ':checked' ) ? 1 : 0,
             show_mobile:   $( '#ysch-show-mobile' ).is( ':checked' ) ? 1 : 0,
             tooltip:       $( '#ysch-tooltip' ).val() || 'appname',

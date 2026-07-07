@@ -40,6 +40,7 @@ class YSChatMigration {
             'side'          => 20,
             'button_color'  => '#8fa8b8',
             'button_icon'   => '',
+            'icon_style'    => 'contain',
             'show_desktop'  => 1,
             'show_mobile'   => 1,
             'tooltip'       => 'appname',
@@ -144,6 +145,9 @@ class YSChatMigration {
         if ( $icon ) {
             $settings['button_icon'] = esc_url_raw( $icon );
         }
+
+        // 自訂圖顯示方式：NinjaTeam wpsaio_button_image（contain=底色圓+60% 圖 / cover=圖佔滿）。
+        $settings['icon_style'] = ( 'cover' === get_option( 'wpsaio_button_image', 'contain' ) ) ? 'cover' : 'contain';
 
         // 顯示條件。
         $condition = (string) get_option( 'wpsaio_display_condition', 'allPages' );

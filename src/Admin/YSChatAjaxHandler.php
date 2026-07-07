@@ -71,6 +71,7 @@ class YSChatAjaxHandler {
         $out['button_color'] = preg_match( '/^#([0-9a-f]{3}|[0-9a-f]{6})$/i', $color ) ? strtolower( $color ) : $defaults['button_color'];
 
         $out['button_icon'] = isset( $raw['button_icon'] ) ? esc_url_raw( (string) $raw['button_icon'] ) : '';
+        $out['icon_style']  = ( isset( $raw['icon_style'] ) && 'cover' === $raw['icon_style'] ) ? 'cover' : 'contain';
 
         $display = isset( $raw['display'] ) ? (string) $raw['display'] : 'all';
         $out['display'] = in_array( $display, [ 'all', 'include', 'exclude' ], true ) ? $display : 'all';
