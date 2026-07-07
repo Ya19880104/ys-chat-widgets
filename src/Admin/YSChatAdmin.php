@@ -1,0 +1,154 @@
+<?php
+/**
+ * 後台管理頁面
+ *
+ * @package YangSheep\ChatWidgets\Admin
+ * @since   1.0.0
+ */
+
+namespace YangSheep\ChatWidgets\Admin;
+
+use YangSheep\ChatWidgets\YSChatApps;
+use YangSheep\ChatWidgets\YSChatMigration;
+use YangSheep\ChatWidgets\YSChatWidgets;
+
+defined( 'ABSPATH' ) || exit;
+
+class YSChatAdmin {
+
+    /** @var string 頁面 slug */
+    private const PAGE_SLUG = 'ys-chat-widgets';
+
+    public function __construct() {
+        add_action( 'admin_menu', [ $this, 'register_menu' ], 20 );
+        add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+        add_action( 'admin_notices', [ $this, 'migration_notice' ] );
+    }
+
+    /**
+     * 註冊選單
+     *
+     * 優先掛載到 ys-toolbox 子選單；若不存在則建立頂層選單
+     */
+    public function register_menu(): void {
+        $parent_slug = menu_page_url( 'ys-toolbox', false ) ? 'ys-toolbox' : null;
+
+        if ( $parent_slug ) {
+            add_submenu_page(
+                'ys-toolbox',
+                __( 'YS CHAT Widgets', 'ys-chat-widgets' ),
+                __( 'YS CHAT Widgets', 'ys-chat-widgets' ),
+                'manage_options',
+                self::PAGE_SLUG,
+                [ $this, 'render_page' ]
+            );
+        } else {
+            add_menu_page(
+                __( 'YS CHAT Widgets', 'ys-chat-widgets' ),
+                __( 'YS CHAT Widgets', 'ys-chat-widgets' ),
+                'manage_options',
+                self::PAGE_SLUG,
+                [ $this, 'render_page' ],
+                'dashicons-format-chat',
+                58
+            );
+        }
+    }
+
+    /**
+     * 移轉成功一次性通知
+     */
+    public function migration_notice(): void {
+        $count = get_transient( 'ys_chat_widgets_migration_notice' );
+        if ( false === $count ) {
+            return;
+        }
+        delete_transient( 'ys_chat_widgets_migration_notice' );
+
+        printf(
+            '<div class="notice notice-success is-dismissible"><p><strong>%s</strong> %s</p></div>',
+            esc_html__( 'YS CHAT Widgets：', 'ys-chat-widgets' ),
+            esc_html(
+                sprintf(
+                    /* translators: %d: 移轉的 App 數量 */
+                    __( '已自動移轉 NinjaTeam Click to Chat 的 %d 個 App 設定（LINE 連結已修正），並停用舊外掛。', 'ys-chat-widgets' ),
+                    (int) $count
+                )
+            )
+        );
+    }
+
+    /**
+     * 載入後台 CSS / JS（僅在本外掛頁面）
+     */
+    public function enqueue_assets( string $hook ): void {
+        $screen = get_current_screen();
+        if ( ! $screen || false === strpos( $screen->id, self::PAGE_SLUG ) ) {
+            return;
+        }
+
+        wp_enqueue_media();
+
+        wp_enqueue_style(
+            'ys-chat-admin',
+            YS_CHAT_WIDGETS_PLUGIN_URL . 'assets/css/ys-chat-admin.css',
+            [],
+            YS_CHAT_WIDGETS_VERSION
+        );
+
+        wp_enqueue_script(
+            'ys-chat-admin',
+            YS_CHAT_WIDGETS_PLUGIN_URL . 'assets/js/ys-chat-admin.js',
+            [ 'jquery' ],
+            YS_CHAT_WIDGETS_VERSION,
+            true
+        );
+
+        $apps_meta = [];
+        foreach ( YSChatApps::all() as $key => $def ) {
+            $apps_meta[ $key ] = [
+                'title'       => $def['title'],
+                'color'       => $def['color'],
+                'icon_fg'     => $def['icon_fg'],
+                'placeholder' => $def['placeholder'],
+                'desc'        => $def['desc'],
+                'icon'        => YSChatApps::icon( $key ),
+            ];
+        }
+
+        wp_localize_script( 'ys-chat-admin', 'ysChatAdmin', [
+            'ajax_url' => admin_url( 'admin-ajax.php' ),
+            'nonce'    => wp_create_nonce( 'ys_chat_widgets_nonce' ),
+            'apps'     => $apps_meta,
+            'settings' => YSChatWidgets::get_settings(),
+            'i18n'     => [
+                'saving'      => __( '儲存中…', 'ys-chat-widgets' ),
+                'saved'       => __( '設定已儲存', 'ys-chat-widgets' ),
+                'error'       => __( '儲存失敗，請重試', 'ys-chat-widgets' ),
+                'remove'      => __( '移除', 'ys-chat-widgets' ),
+                'moveUp'      => __( '上移', 'ys-chat-widgets' ),
+                'moveDown'    => __( '下移', 'ys-chat-widgets' ),
+                'customTitle' => __( '顯示名稱', 'ys-chat-widgets' ),
+                'chooseImage' => __( '選擇圖片', 'ys-chat-widgets' ),
+                'emptyApps'   => __( '尚未加入任何 App — 從上方選擇要顯示的聯絡方式。', 'ys-chat-widgets' ),
+            ],
+        ] );
+    }
+
+    /**
+     * 渲染後台頁面
+     */
+    public function render_page(): void {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( '你沒有足夠的權限。', 'ys-chat-widgets' ) );
+        }
+
+        $settings  = YSChatWidgets::get_settings();
+        $migration = YSChatMigration::status();
+
+        $template = YS_CHAT_WIDGETS_PLUGIN_DIR . 'templates/admin/settings.php';
+        if ( file_exists( $template ) ) {
+            include $template;
+        }
+    }
+}

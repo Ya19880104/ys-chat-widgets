@@ -1,0 +1,23 @@
+{
+    "name": "yangsheep/ys-chat-widgets",
+    "description": "浮動聯絡按鈕（LINE、Messenger、WhatsApp、電話、Email 等）— 純錨點設計，不誤觸發 App",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "YANGSHEEP DESIGN",
+            "homepage": "https://yangsheep.com.tw"
+        }
+    ],
+    "require": {
+        "php": ">=8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "YangSheep\\ChatWidgets\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

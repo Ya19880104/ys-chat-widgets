@@ -1,0 +1,200 @@
+<?php
+/**
+ * 後台設定頁面模板
+ *
+ * 由 YSChatAdmin::render_page() 載入，可用變數：
+ * - $settings  array 目前設定
+ * - $migration ?array 移轉狀態
+ *
+ * @package YangSheep\ChatWidgets
+ * @since   1.0.0
+ */
+
+use YangSheep\ChatWidgets\YSChatApps;
+
+defined( 'ABSPATH' ) || exit;
+
+/** @var array $settings */
+/** @var ?array $migration */
+
+$ysch_apps_defs = YSChatApps::all();
+?>
+<!-- Hero Header（在 .wrap 外面，避免 WP notice 注入） -->
+<div class="ysch-hero">
+    <div class="ysch-hero-content">
+        <div class="ysch-hero-title">
+            <span class="dashicons dashicons-format-chat"></span>
+            <?php echo esc_html__( 'YS CHAT Widgets', 'ys-chat-widgets' ); ?>
+        </div>
+        <div class="ysch-hero-subtitle"><?php
+            printf(
+                esc_html__( '浮動聯絡按鈕 — 由 %s 開發與維護', 'ys-chat-widgets' ),
+                '<a href="https://yangsheep.com.tw" target="_blank" rel="noopener noreferrer" style="color:rgba(255,255,255,0.95);text-decoration:none;">YANGSHEEP CLOUD</a>'
+            );
+        ?></div>
+    </div>
+    <span class="ysch-version-badge">v<?php echo esc_html( YS_CHAT_WIDGETS_VERSION ); ?></span>
+</div>
+
+<!-- WP notice 錨點 -->
+<div class="wrap"><h2 style="display:none;"></h2></div>
+
+<div class="ysch-admin-wrap">
+
+    <?php if ( $migration && 'migrated' === ( $migration['status'] ?? '' ) ) : ?>
+    <div class="ysch-card ysch-card-migrated">
+        <p>
+            <span class="dashicons dashicons-yes-alt"></span>
+            <?php
+            printf(
+                /* translators: 1: App 數量, 2: 移轉時間 */
+                esc_html__( '已於 %2$s（UTC）自動移轉 NinjaTeam Click to Chat 的 %1$d 個 App，LINE 連結格式已修正，舊外掛已停用。確認顯示正常後即可刪除舊外掛。', 'ys-chat-widgets' ),
+                (int) ( $migration['apps'] ?? 0 ),
+                esc_html( $migration['at'] ?? '' )
+            );
+            ?>
+        </p>
+    </div>
+    <?php endif; ?>
+
+    <!-- 基本設定 -->
+    <div class="ysch-card">
+        <h2>
+            <span class="dashicons dashicons-admin-appearance"></span>
+            <?php echo esc_html__( '按鈕外觀', 'ys-chat-widgets' ); ?>
+        </h2>
+
+        <div class="ysch-field ysch-field-inline">
+            <label class="ysch-switch">
+                <input type="checkbox" id="ysch-enabled" <?php checked( ! empty( $settings['enabled'] ) ); ?> />
+                <span class="ysch-switch-track"></span>
+            </label>
+            <label for="ysch-enabled" class="ysch-inline-label"><?php echo esc_html__( '啟用浮動按鈕', 'ys-chat-widgets' ); ?></label>
+        </div>
+
+        <div class="ysch-field">
+            <label><?php echo esc_html__( '位置', 'ys-chat-widgets' ); ?></label>
+            <div class="ysch-radio-group">
+                <label class="ysch-radio-card">
+                    <input type="radio" name="ysch-position" value="left" <?php checked( 'left' === ( $settings['position'] ?? 'right' ) ); ?> />
+                    <span class="ysch-radio-card-body">
+                        <span class="ysch-pos-preview ysch-pos-preview-left"><i></i></span>
+                        <?php echo esc_html__( '左下角', 'ys-chat-widgets' ); ?>
+                    </span>
+                </label>
+                <label class="ysch-radio-card">
+                    <input type="radio" name="ysch-position" value="right" <?php checked( 'left' !== ( $settings['position'] ?? 'right' ) ); ?> />
+                    <span class="ysch-radio-card-body">
+                        <span class="ysch-pos-preview ysch-pos-preview-right"><i></i></span>
+                        <?php echo esc_html__( '右下角', 'ys-chat-widgets' ); ?>
+                    </span>
+                </label>
+            </div>
+        </div>
+
+        <div class="ysch-field-row">
+            <div class="ysch-field">
+                <label for="ysch-bottom"><?php echo esc_html__( '距離底部（px）', 'ys-chat-widgets' ); ?></label>
+                <input type="number" id="ysch-bottom" min="0" max="400" value="<?php echo esc_attr( (string) ( $settings['bottom'] ?? 30 ) ); ?>" />
+            </div>
+            <div class="ysch-field">
+                <label for="ysch-side"><?php echo esc_html__( '距離側邊（px）', 'ys-chat-widgets' ); ?></label>
+                <input type="number" id="ysch-side" min="0" max="400" value="<?php echo esc_attr( (string) ( $settings['side'] ?? 20 ) ); ?>" />
+            </div>
+            <div class="ysch-field">
+                <label for="ysch-button-color"><?php echo esc_html__( '按鈕顏色', 'ys-chat-widgets' ); ?></label>
+                <input type="color" id="ysch-button-color" value="<?php echo esc_attr( (string) ( $settings['button_color'] ?? '#8fa8b8' ) ); ?>" />
+            </div>
+        </div>
+
+        <div class="ysch-field">
+            <label for="ysch-button-icon"><?php echo esc_html__( '自訂按鈕圖示（選填）', 'ys-chat-widgets' ); ?></label>
+            <div class="ysch-media-row">
+                <input type="url" id="ysch-button-icon" value="<?php echo esc_attr( (string) ( $settings['button_icon'] ?? '' ) ); ?>" placeholder="https://" />
+                <button type="button" class="ysch-btn ysch-btn-secondary" id="ysch-button-icon-pick"><?php echo esc_html__( '選擇圖片', 'ys-chat-widgets' ); ?></button>
+            </div>
+            <p class="description"><?php echo esc_html__( '留空使用內建聊天圖示。', 'ys-chat-widgets' ); ?></p>
+        </div>
+    </div>
+
+    <!-- Apps 管理 -->
+    <div class="ysch-card">
+        <h2>
+            <span class="dashicons dashicons-share"></span>
+            <?php echo esc_html__( '聯絡方式（Apps）', 'ys-chat-widgets' ); ?>
+        </h2>
+
+        <div class="ysch-app-picker">
+            <?php foreach ( $ysch_apps_defs as $ysch_key => $ysch_def ) : ?>
+                <button type="button" class="ysch-app-add" data-app="<?php echo esc_attr( $ysch_key ); ?>"
+                        title="<?php echo esc_attr( sprintf( /* translators: %s: App 名稱 */ __( '加入 %s', 'ys-chat-widgets' ), $ysch_def['title'] ) ); ?>"
+                        style="--ysch-app-color:<?php echo esc_attr( $ysch_def['color'] ); ?>;--ysch-app-fg:<?php echo esc_attr( $ysch_def['icon_fg'] ); ?>;">
+                    <span class="ysch-app-add-icon"><?php echo YSChatApps::icon( $ysch_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                    <span class="ysch-app-add-label"><?php echo esc_html( $ysch_def['title'] ); ?></span>
+                </button>
+            <?php endforeach; ?>
+        </div>
+
+        <ul id="ysch-app-list" class="ysch-app-list"></ul>
+        <p id="ysch-app-empty" class="ysch-empty" style="display:none;"></p>
+    </div>
+
+    <!-- 顯示條件 -->
+    <div class="ysch-card">
+        <h2>
+            <span class="dashicons dashicons-visibility"></span>
+            <?php echo esc_html__( '顯示條件', 'ys-chat-widgets' ); ?>
+        </h2>
+
+        <div class="ysch-field ysch-field-inline">
+            <label><input type="checkbox" id="ysch-show-desktop" <?php checked( ! empty( $settings['show_desktop'] ) ); ?> /> <?php echo esc_html__( '桌機顯示', 'ys-chat-widgets' ); ?></label>
+            <label><input type="checkbox" id="ysch-show-mobile" <?php checked( ! empty( $settings['show_mobile'] ) ); ?> /> <?php echo esc_html__( '手機顯示', 'ys-chat-widgets' ); ?></label>
+        </div>
+
+        <div class="ysch-field">
+            <label><?php echo esc_html__( '標籤文字', 'ys-chat-widgets' ); ?></label>
+            <select id="ysch-tooltip">
+                <option value="appname" <?php selected( 'appname', $settings['tooltip'] ?? 'appname' ); ?>><?php echo esc_html__( '顯示 App 名稱', 'ys-chat-widgets' ); ?></option>
+                <option value="content" <?php selected( 'content', $settings['tooltip'] ?? 'appname' ); ?>><?php echo esc_html__( '顯示聯絡內容（ID / 號碼）', 'ys-chat-widgets' ); ?></option>
+            </select>
+        </div>
+
+        <div class="ysch-field">
+            <label><?php echo esc_html__( '頁面範圍', 'ys-chat-widgets' ); ?></label>
+            <select id="ysch-display">
+                <option value="all" <?php selected( 'all', $settings['display'] ?? 'all' ); ?>><?php echo esc_html__( '全站顯示', 'ys-chat-widgets' ); ?></option>
+                <option value="include" <?php selected( 'include', $settings['display'] ?? 'all' ); ?>><?php echo esc_html__( '只在指定頁面顯示', 'ys-chat-widgets' ); ?></option>
+                <option value="exclude" <?php selected( 'exclude', $settings['display'] ?? 'all' ); ?>><?php echo esc_html__( '在指定頁面隱藏', 'ys-chat-widgets' ); ?></option>
+            </select>
+        </div>
+
+        <?php
+        $ysch_pages = get_pages( [ 'sort_column' => 'menu_order,post_title' ] );
+        $ysch_inc   = array_map( 'intval', (array) ( $settings['include_pages'] ?? [] ) );
+        $ysch_exc   = array_map( 'intval', (array) ( $settings['exclude_pages'] ?? [] ) );
+        ?>
+        <div class="ysch-field" id="ysch-include-wrap" style="display:none;">
+            <label for="ysch-include-pages"><?php echo esc_html__( '指定顯示的頁面（可多選）', 'ys-chat-widgets' ); ?></label>
+            <select id="ysch-include-pages" multiple size="6">
+                <?php foreach ( $ysch_pages as $ysch_p ) : ?>
+                    <option value="<?php echo esc_attr( (string) $ysch_p->ID ); ?>" <?php selected( in_array( (int) $ysch_p->ID, $ysch_inc, true ) ); ?>><?php echo esc_html( $ysch_p->post_title ); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="ysch-field" id="ysch-exclude-wrap" style="display:none;">
+            <label for="ysch-exclude-pages"><?php echo esc_html__( '指定隱藏的頁面（可多選）', 'ys-chat-widgets' ); ?></label>
+            <select id="ysch-exclude-pages" multiple size="6">
+                <?php foreach ( $ysch_pages as $ysch_p ) : ?>
+                    <option value="<?php echo esc_attr( (string) $ysch_p->ID ); ?>" <?php selected( in_array( (int) $ysch_p->ID, $ysch_exc, true ) ); ?>><?php echo esc_html( $ysch_p->post_title ); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+
+    <!-- 儲存按鈕 -->
+    <button type="button" id="ysch-save-btn" class="ysch-btn ysch-btn-primary">
+        <span class="dashicons dashicons-saved"></span>
+        <?php echo esc_html__( '儲存設定', 'ys-chat-widgets' ); ?>
+    </button>
+
+</div>

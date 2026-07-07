@@ -1,0 +1,10 @@
+# 開發物件（不入線上 repo）
+.claude/
+.dev/
+node_modules/
+tests/
+DEVELOPMENT.md
+outputs/
+*.zip
+.DS_Store
+Thumbs.db
