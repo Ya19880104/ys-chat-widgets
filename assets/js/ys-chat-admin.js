@@ -47,24 +47,40 @@
 
             var $row = $( '<li class="ysch-app-row">' ).attr( 'data-idx', idx );
 
-            $( '<span class="ysch-app-row-icon">' )
+            // 圖示預覽：有自訂圖示就顯示上傳圖，否則內建 SVG。
+            var $rowIcon = $( '<span class="ysch-app-row-icon">' )
                 .css( { background: meta.color, color: meta.icon_fg } )
-                .html( meta.icon )
                 .appendTo( $row );
+            if ( app.icon ) {
+                $( '<img>' ).attr( 'src', app.icon ).css( { width: '62%', height: '62%', objectFit: 'contain' } ).appendTo( $rowIcon );
+            } else {
+                $rowIcon.html( meta.icon );
+            }
 
             var $main = $( '<div class="ysch-app-row-main">' ).appendTo( $row );
             $( '<span class="ysch-app-row-name">' ).text( meta.title ).appendTo( $main );
 
+            // 聯絡內容。
             $( '<input type="text" class="ysch-app-value">' )
                 .attr( 'placeholder', meta.placeholder )
                 .val( app.value || '' )
                 .appendTo( $main );
 
-            if ( 'custom' === app.key ) {
-                $( '<input type="text" class="ysch-app-title">' )
-                    .attr( 'placeholder', ysChatAdmin.i18n.customTitle )
-                    .val( app.title || '' )
-                    .appendTo( $main );
+            // 顯示名稱（所有 app 都可改；留空用預設）。
+            $( '<input type="text" class="ysch-app-title">' )
+                .attr( 'placeholder', ysChatAdmin.i18n.customTitle + '：' + meta.title )
+                .val( app.title || '' )
+                .appendTo( $main );
+
+            // 自訂圖示上傳 / 移除。
+            var $iconRow = $( '<div class="ysch-app-icon-row">' ).appendTo( $main );
+            $( '<button type="button" class="ysch-btn ysch-btn-secondary ysch-app-icon-pick">' )
+                .html( '<span class="dashicons dashicons-format-image"></span>' + ysChatAdmin.i18n.uploadIcon )
+                .appendTo( $iconRow );
+            if ( app.icon ) {
+                $( '<button type="button" class="ysch-btn ysch-btn-secondary ysch-app-icon-remove">' )
+                    .text( ysChatAdmin.i18n.removeIcon )
+                    .appendTo( $iconRow );
             }
 
             $( '<p class="description">' ).text( meta.desc ).appendTo( $main );
@@ -97,7 +113,7 @@
 
     $( document ).on( 'click', '.ysch-app-add', function () {
         syncInputs();
-        apps.push( { key: $( this ).data( 'app' ), value: '', title: '' } );
+        apps.push( { key: $( this ).data( 'app' ), value: '', title: '', icon: '' } );
         renderApps();
         // 聚焦新列輸入框。
         $( '#ysch-app-list .ysch-app-row' ).last().find( '.ysch-app-value' ).trigger( 'focus' );
@@ -125,6 +141,31 @@
             apps.splice( idx + 1, 0, apps.splice( idx, 1 )[ 0 ] );
             renderApps();
         }
+    } );
+
+    // 每個 App 的自訂圖示上傳。
+    $( document ).on( 'click', '#ysch-app-list .ysch-app-icon-pick', function ( e ) {
+        e.preventDefault();
+        if ( ! window.wp || ! wp.media ) {
+            return;
+        }
+        syncInputs();
+        var idx = parseInt( $( this ).closest( '.ysch-app-row' ).data( 'idx' ), 10 );
+        var frame = wp.media( { title: ysChatAdmin.i18n.chooseImage, multiple: false, library: { type: 'image' } } );
+        frame.on( 'select', function () {
+            var att = frame.state().get( 'selection' ).first().toJSON();
+            if ( apps[ idx ] ) { apps[ idx ].icon = att.url; }
+            renderApps();
+        } );
+        frame.open();
+    } );
+
+    // 移除某 App 的自訂圖示（還原內建圖示）。
+    $( document ).on( 'click', '#ysch-app-list .ysch-app-icon-remove', function () {
+        syncInputs();
+        var idx = parseInt( $( this ).closest( '.ysch-app-row' ).data( 'idx' ), 10 );
+        if ( apps[ idx ] ) { apps[ idx ].icon = ''; }
+        renderApps();
     } );
 
     /* ── 顯示條件切換 ─────────────────────── */

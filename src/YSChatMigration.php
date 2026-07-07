@@ -196,8 +196,14 @@ class YSChatMigration {
 
             $key   = self::map_app_key( (string) $njt_key );
             $title = '';
-            if ( 'custom' === $key && ! empty( $params['custom-app-title'] ) && is_string( $params['custom-app-title'] ) ) {
-                $title = sanitize_text_field( $params['custom-app-title'] );
+            $icon  = '';
+            if ( 'custom' === $key ) {
+                if ( ! empty( $params['custom-app-title'] ) && is_string( $params['custom-app-title'] ) ) {
+                    $title = sanitize_text_field( $params['custom-app-title'] );
+                }
+                if ( ! empty( $params['url-icon'] ) && is_string( $params['url-icon'] ) ) {
+                    $icon = esc_url_raw( $params['url-icon'] );
+                }
             }
 
             // 連結清洗：完整網址 / 純 ID / 雙重網址 bug 全部相融。
@@ -210,6 +216,7 @@ class YSChatMigration {
                 'key'   => $key,
                 'value' => $value,
                 'title' => $title,
+                'icon'  => $icon,
             ];
         }
 

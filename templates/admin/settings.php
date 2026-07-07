@@ -196,6 +196,7 @@ $ysch_apps_defs = YSChatApps::all();
             <select id="ysch-tooltip">
                 <option value="appname" <?php selected( 'appname', $settings['tooltip'] ?? 'appname' ); ?>><?php echo esc_html__( '顯示 App 名稱', 'ys-chat-widgets' ); ?></option>
                 <option value="content" <?php selected( 'content', $settings['tooltip'] ?? 'appname' ); ?>><?php echo esc_html__( '顯示聯絡內容（ID / 號碼）', 'ys-chat-widgets' ); ?></option>
+                <option value="none" <?php selected( 'none', $settings['tooltip'] ?? 'appname' ); ?>><?php echo esc_html__( '不顯示文字（只有圖示）', 'ys-chat-widgets' ); ?></option>
             </select>
         </div>
 

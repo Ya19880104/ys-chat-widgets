@@ -379,6 +379,30 @@
     display: block;
 }
 
+.ysch-app-row-icon img {
+    display: block;
+    border-radius: 50%;
+}
+
+/* App 自訂圖示按鈕列 */
+.ysch-app-icon-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+}
+
+.ysch-app-icon-row .ysch-btn {
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.ysch-app-icon-row .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
 .ysch-app-row-main {
     flex: 1;
     display: flex;

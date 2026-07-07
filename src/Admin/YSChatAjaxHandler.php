@@ -64,7 +64,8 @@ class YSChatAjaxHandler {
         $out['side']         = isset( $raw['side'] ) ? min( 400, max( 0, (int) $raw['side'] ) ) : $defaults['side'];
         $out['show_desktop'] = ! empty( $raw['show_desktop'] ) ? 1 : 0;
         $out['show_mobile']  = ! empty( $raw['show_mobile'] ) ? 1 : 0;
-        $out['tooltip']      = ( isset( $raw['tooltip'] ) && 'content' === $raw['tooltip'] ) ? 'content' : 'appname';
+        $tt                  = isset( $raw['tooltip'] ) ? (string) $raw['tooltip'] : 'appname';
+        $out['tooltip']      = in_array( $tt, [ 'appname', 'content', 'none' ], true ) ? $tt : 'appname';
         $out['mode']         = ( isset( $raw['mode'] ) && 'popup' === $raw['mode'] ) ? 'popup' : 'redirect';
         $style_mode          = isset( $raw['style_mode'] ) ? (string) $raw['style_mode'] : 'auto';
         $out['style_mode']   = in_array( $style_mode, [ 'auto', 'force', 'off' ], true ) ? $style_mode : 'auto';
@@ -98,6 +99,7 @@ class YSChatAjaxHandler {
                 'key'   => $key,
                 'value' => $value,
                 'title' => isset( $app['title'] ) ? sanitize_text_field( (string) $app['title'] ) : '',
+                'icon'  => isset( $app['icon'] ) ? esc_url_raw( (string) $app['icon'] ) : '',
             ];
             if ( count( $apps ) >= 20 ) {
                 break;

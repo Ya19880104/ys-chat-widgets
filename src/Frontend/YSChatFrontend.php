@@ -226,6 +226,8 @@ class YSChatFrontend {
             if ( 'content' === $tooltip ) {
                 $label = (string) $app['value'];
             }
+            $show_label  = ( 'none' !== $tooltip );
+            $custom_icon = ! empty( $app['icon'] ) ? esc_url_raw( (string) $app['icon'] ) : '';
 
             // tel:/mailto: 等本地 scheme 不需要新分頁。
             $is_external = (bool) preg_match( '#^https?://#i', $url );
@@ -256,8 +258,17 @@ class YSChatFrontend {
                     'line-height'     => '0',
                 ], $force );
                 ?>
-                <span class="ysch-icon" aria-hidden="true" style="<?php echo esc_attr( $icon_inline ); ?>"><?php echo YSChatApps::icon( $key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                <span class="ysch-icon" aria-hidden="true" style="<?php echo esc_attr( $icon_inline ); ?>"><?php
+                if ( $custom_icon ) {
+                    $ci_inline = self::inline_style( [ 'width' => '62%', 'height' => '62%', 'object-fit' => 'contain', 'display' => 'block' ], $force );
+                    printf( '<img src="%s" alt="" loading="lazy" style="%s" />', esc_url( $custom_icon ), esc_attr( $ci_inline ) );
+                } else {
+                    echo YSChatApps::icon( $key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                }
+                ?></span>
+                <?php if ( $show_label ) : ?>
                 <span class="ysch-label"><?php echo esc_html( $label ); ?></span>
+                <?php endif; ?>
             </a>
         </li>
             <?php

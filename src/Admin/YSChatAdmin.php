@@ -115,8 +115,10 @@ class YSChatAdmin {
                 'remove'      => __( '移除', 'ys-chat-widgets' ),
                 'moveUp'      => __( '上移', 'ys-chat-widgets' ),
                 'moveDown'    => __( '下移', 'ys-chat-widgets' ),
-                'customTitle' => __( '顯示名稱', 'ys-chat-widgets' ),
+                'customTitle' => __( '顯示名稱（留空用預設）', 'ys-chat-widgets' ),
                 'chooseImage' => __( '選擇圖片', 'ys-chat-widgets' ),
+                'uploadIcon'  => __( '自訂圖示', 'ys-chat-widgets' ),
+                'removeIcon'  => __( '移除圖示', 'ys-chat-widgets' ),
                 'emptyApps'   => __( '尚未加入任何 App — 從上方選擇要顯示的聯絡方式。', 'ys-chat-widgets' ),
             ],
         ] );
