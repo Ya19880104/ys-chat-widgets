@@ -66,6 +66,8 @@ class YSChatAjaxHandler {
         $out['show_mobile']  = ! empty( $raw['show_mobile'] ) ? 1 : 0;
         $out['tooltip']      = ( isset( $raw['tooltip'] ) && 'content' === $raw['tooltip'] ) ? 'content' : 'appname';
         $out['mode']         = ( isset( $raw['mode'] ) && 'popup' === $raw['mode'] ) ? 'popup' : 'redirect';
+        $style_mode          = isset( $raw['style_mode'] ) ? (string) $raw['style_mode'] : 'auto';
+        $out['style_mode']   = in_array( $style_mode, [ 'auto', 'force', 'off' ], true ) ? $style_mode : 'auto';
 
         $color = isset( $raw['button_color'] ) ? (string) $raw['button_color'] : '';
         $out['button_color'] = preg_match( '/^#([0-9a-f]{3}|[0-9a-f]{6})$/i', $color ) ? strtolower( $color ) : $defaults['button_color'];

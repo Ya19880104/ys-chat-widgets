@@ -177,6 +177,7 @@
             show_mobile:   $( '#ysch-show-mobile' ).is( ':checked' ) ? 1 : 0,
             tooltip:       $( '#ysch-tooltip' ).val() || 'appname',
             mode:          $( 'input[name="ysch-mode"]:checked' ).val() || 'redirect',
+            style_mode:    $( '#ysch-style-mode' ).val() || 'auto',
             display:       $( '#ysch-display' ).val() || 'all',
             include_pages: ( $( '#ysch-include-pages' ).val() || [] ).map( Number ),
             exclude_pages: ( $( '#ysch-exclude-pages' ).val() || [] ).map( Number ),

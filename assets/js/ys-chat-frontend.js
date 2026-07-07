@@ -295,6 +295,75 @@
                 } );
             } );
         }
+
+        // ── 相容模式：auto = 偵測被主題破壞才強制（自動防呆） ──
+        var styleMode = wrap.getAttribute( 'data-stylemode' ) || 'auto';
+        if ( 'auto' === styleMode ) {
+            setupAutoHeal( wrap, toggle );
+        }
+    }
+
+    /** 以 !important 逐條套用（JS 端最高優先級，連 stylesheet !important 都壓得過）。 */
+    function setImportant( el, map ) {
+        if ( ! el ) { return; }
+        for ( var k in map ) {
+            try { el.style.setProperty( k, map[ k ], 'important' ); } catch ( e ) {}
+        }
+    }
+
+    /** 判斷主按鈕是否被主題破壞（底色被清成透明，或尺寸被壓縮）。 */
+    function toggleLooksBroken( toggle ) {
+        var cs = getComputedStyle( toggle );
+        var bg = cs.backgroundColor;
+        var transparent = ( 'rgba(0, 0, 0, 0)' === bg || 'transparent' === bg );
+        var w = parseFloat( cs.width ) || 0;
+        return transparent || w < 44;
+    }
+
+    /** 強制套用關鍵樣式（用 widget 上的 data 色值 — 即使用者自訂顏色）。 */
+    function forceStyles( wrap, toggle ) {
+        var color = wrap.getAttribute( 'data-color' ) || '#8fa8b8';
+        var fg    = wrap.getAttribute( 'data-fg' ) || '#ffffff';
+        setImportant( toggle, {
+            'position': 'relative', 'box-sizing': 'border-box', 'display': 'flex',
+            'align-items': 'center', 'justify-content': 'center',
+            'width': '56px', 'height': '56px', 'min-width': '56px',
+            'padding': '0', 'margin': '0', 'border': 'none', 'border-radius': '50%',
+            'background': color, 'color': fg, 'cursor': 'pointer', 'line-height': '0',
+            'box-shadow': '0 4px 14px rgba(0,0,0,0.22)'
+        } );
+        var spans = toggle.querySelectorAll( '.ysch-toggle-open, .ysch-toggle-close' );
+        for ( var i = 0; i < spans.length; i++ ) {
+            setImportant( spans[ i ], { 'position': 'absolute', 'inset': '0', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center', 'margin': '0' } );
+        }
+        var items = wrap.querySelectorAll( '.ysch-item' );
+        for ( var j = 0; j < items.length; j++ ) {
+            var icon = items[ j ].querySelector( '.ysch-icon' );
+            setImportant( icon, {
+                'box-sizing': 'border-box', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center',
+                'width': '46px', 'height': '46px', 'min-width': '46px', 'border-radius': '50%',
+                'background': items[ j ].getAttribute( 'data-appcolor' ) || color,
+                'color': items[ j ].getAttribute( 'data-appfg' ) || '#ffffff', 'flex': '0 0 auto', 'line-height': '0'
+            } );
+        }
+    }
+
+    /** 自動防呆：載入後多個時點檢查，一旦偵測破壞即強制修正。 */
+    function setupAutoHeal( wrap, toggle ) {
+        var healed = false;
+        function heal() {
+            if ( healed ) { return; }
+            if ( toggleLooksBroken( toggle ) ) {
+                forceStyles( wrap, toggle );
+                healed = true;
+            }
+        }
+        heal();
+        // 主題 CSS 可能較晚套用 → 多檢查幾次。
+        window.addEventListener( 'load', heal );
+        setTimeout( heal, 300 );
+        setTimeout( heal, 1000 );
+        setTimeout( heal, 2500 );
     }
 
     if ( 'loading' === document.readyState ) {

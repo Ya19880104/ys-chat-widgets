@@ -128,6 +128,20 @@ class YSChatFrontend {
     }
 
     /**
+     * 組出 inline 樣式字串；$force=true 時每條宣告加上 !important。
+     *
+     * @param array<string,string> $decls 屬性 => 值
+     */
+    private static function inline_style( array $decls, bool $force ): string {
+        $imp = $force ? '!important' : '';
+        $out = '';
+        foreach ( $decls as $prop => $val ) {
+            $out .= $prop . ':' . $val . $imp . ';';
+        }
+        return $out;
+    }
+
+    /**
      * 輸出浮動按鈕 HTML
      */
     public function render_widget(): void {
@@ -148,6 +162,14 @@ class YSChatFrontend {
         $defs     = YSChatApps::all();
         $toggle_fg = YSChatApps::contrast_fg( $color );
 
+        // 相容模式：auto（偵測到被主題破壞才由 JS 強制，防呆預設）／force（一律 !important）／off（不強制）。
+        $style_mode = (string) ( $settings['style_mode'] ?? 'auto' );
+        if ( ! in_array( $style_mode, [ 'auto', 'force', 'off' ], true ) ) {
+            $style_mode = 'auto';
+        }
+        // 只有 force 模式在 server 端就加 !important；auto 交給 JS 偵測後補上（省去友善主題的多餘 !important）。
+        $force = ( 'force' === $style_mode );
+
         $style = sprintf(
             '--ysch-bottom:%dpx;--ysch-side:%dpx;--ysch-color:%s;',
             $bottom,
@@ -155,19 +177,38 @@ class YSChatFrontend {
             $color
         );
 
-        // 關鍵樣式一律 inline + !important（CSS 優先級最高）— 不論主題 CSS 多強勢
-        // （含 Elementor 系常見的 button !important 重置）、或 CDN 快取殘留舊樣式，
-        // 主按鈕與 app 圖示的圓形底色、尺寸、圖示顏色都不會被蓋掉。
-        $toggle_inline = 'position:relative!important;box-sizing:border-box!important;display:flex!important;'
-            . 'align-items:center!important;justify-content:center!important;'
-            . 'width:56px!important;height:56px!important;min-width:56px!important;padding:0!important;margin:0!important;'
-            . 'border:none!important;border-radius:50%!important;background:' . $color . '!important;color:' . $toggle_fg . '!important;'
-            . 'cursor:pointer!important;line-height:0!important;box-shadow:0 4px 14px rgba(0,0,0,0.22)!important;'
-            . '-webkit-appearance:none!important;appearance:none!important;';
-        $swap_inline = 'position:absolute!important;inset:0!important;display:flex!important;'
-            . 'align-items:center!important;justify-content:center!important;margin:0!important;';
+        // 關鍵樣式一律 inline（優先級高於主題 class）；force 模式再加 !important（連 stylesheet 的 !important 都壓得過）。
+        $toggle_inline = self::inline_style( [
+            'position'         => 'relative',
+            'box-sizing'       => 'border-box',
+            'display'          => 'flex',
+            'align-items'      => 'center',
+            'justify-content'  => 'center',
+            'width'            => '56px',
+            'height'           => '56px',
+            'min-width'        => '56px',
+            'padding'          => '0',
+            'margin'           => '0',
+            'border'           => 'none',
+            'border-radius'    => '50%',
+            'background'       => $color,
+            'color'            => $toggle_fg,
+            'cursor'           => 'pointer',
+            'line-height'      => '0',
+            'box-shadow'       => '0 4px 14px rgba(0,0,0,0.22)',
+            '-webkit-appearance' => 'none',
+            'appearance'       => 'none',
+        ], $force );
+        $swap_inline = self::inline_style( [
+            'position'        => 'absolute',
+            'inset'           => '0',
+            'display'         => 'flex',
+            'align-items'     => 'center',
+            'justify-content' => 'center',
+            'margin'          => '0',
+        ], $force );
         ?>
-<div id="ys-chat-widgets" class="ysch-wrap ysch-pos-<?php echo esc_attr( $position ); ?>" data-mode="<?php echo esc_attr( ( 'popup' === ( $settings['mode'] ?? 'redirect' ) ) ? 'popup' : 'redirect' ); ?>" style="<?php echo esc_attr( $style ); ?>">
+<div id="ys-chat-widgets" class="ysch-wrap ysch-pos-<?php echo esc_attr( $position ); ?>" data-mode="<?php echo esc_attr( ( 'popup' === ( $settings['mode'] ?? 'redirect' ) ) ? 'popup' : 'redirect' ); ?>" data-stylemode="<?php echo esc_attr( $style_mode ); ?>" data-color="<?php echo esc_attr( $color ); ?>" data-fg="<?php echo esc_attr( $toggle_fg ); ?>" style="<?php echo esc_attr( $style ); ?>">
     <ul class="ysch-items" role="list">
         <?php
         foreach ( (array) $settings['apps'] as $app ) {
@@ -199,7 +240,23 @@ class YSChatFrontend {
                data-appcolor="<?php echo esc_attr( $def['color'] ); ?>"
                data-appfg="<?php echo esc_attr( $def['icon_fg'] ); ?>"
                style="--ysch-app-color:<?php echo esc_attr( $def['color'] ); ?>;--ysch-app-fg:<?php echo esc_attr( $def['icon_fg'] ); ?>;text-decoration:none;">
-                <span class="ysch-icon" aria-hidden="true" style="box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;width:46px!important;height:46px!important;min-width:46px!important;border-radius:50%!important;background:<?php echo esc_attr( $def['color'] ); ?>!important;color:<?php echo esc_attr( $def['icon_fg'] ); ?>!important;flex:0 0 auto!important;line-height:0!important;"><?php echo YSChatApps::icon( $key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                <?php
+                $icon_inline = self::inline_style( [
+                    'box-sizing'      => 'border-box',
+                    'display'         => 'flex',
+                    'align-items'     => 'center',
+                    'justify-content' => 'center',
+                    'width'           => '46px',
+                    'height'          => '46px',
+                    'min-width'       => '46px',
+                    'border-radius'   => '50%',
+                    'background'      => $def['color'],
+                    'color'           => $def['icon_fg'],
+                    'flex'            => '0 0 auto',
+                    'line-height'     => '0',
+                ], $force );
+                ?>
+                <span class="ysch-icon" aria-hidden="true" style="<?php echo esc_attr( $icon_inline ); ?>"><?php echo YSChatApps::icon( $key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
                 <span class="ysch-label"><?php echo esc_html( $label ); ?></span>
             </a>
         </li>
@@ -214,8 +271,8 @@ class YSChatFrontend {
             <?php
             $icon_style = ( 'cover' === ( $settings['icon_style'] ?? 'contain' ) ) ? 'cover' : 'contain';
             $img_inline = ( 'cover' === $icon_style )
-                ? 'width:100%!important;height:100%!important;border-radius:50%!important;object-fit:cover!important;display:block!important;'
-                : 'width:60%!important;height:60%!important;border-radius:0!important;object-fit:contain!important;display:block!important;';
+                ? self::inline_style( [ 'width' => '100%', 'height' => '100%', 'border-radius' => '50%', 'object-fit' => 'cover', 'display' => 'block' ], $force )
+                : self::inline_style( [ 'width' => '60%', 'height' => '60%', 'border-radius' => '0', 'object-fit' => 'contain', 'display' => 'block' ], $force );
             ?>
             <span class="ysch-toggle-open ysch-toggle-img ysch-icon-<?php echo esc_attr( $icon_style ); ?>" style="<?php echo esc_attr( $swap_inline ); ?>"><img src="<?php echo esc_url( $btn_icon ); ?>" alt="" loading="lazy" style="<?php echo esc_attr( $img_inline ); ?>" /></span>
         <?php else : ?>

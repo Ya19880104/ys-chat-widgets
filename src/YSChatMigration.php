@@ -45,6 +45,7 @@ class YSChatMigration {
             'show_mobile'   => 1,
             'tooltip'       => 'appname',
             'mode'          => 'redirect',
+            'style_mode'    => 'auto',
             'display'       => 'all',
             'include_pages' => [],
             'exclude_pages' => [],

@@ -123,6 +123,17 @@ $ysch_apps_defs = YSChatApps::all();
                 <option value="cover" <?php selected( 'cover' === ( $settings['icon_style'] ?? 'contain' ) ); ?>><?php echo esc_html__( '佔滿整圓（適合完整圓形圖片）', 'ys-chat-widgets' ); ?></option>
             </select>
         </div>
+
+        <div class="ysch-field">
+            <label><?php echo esc_html__( '顯示相容模式（防呆）', 'ys-chat-widgets' ); ?></label>
+            <?php $sm = $settings['style_mode'] ?? 'auto'; ?>
+            <select id="ysch-style-mode">
+                <option value="auto"  <?php selected( 'auto', $sm ); ?>><?php echo esc_html__( '自動（推薦）— 偵測到按鈕被佈景主題影響才強制修正', 'ys-chat-widgets' ); ?></option>
+                <option value="force" <?php selected( 'force', $sm ); ?>><?php echo esc_html__( '一律強制 — 永遠以最高優先級套用（適合已知主題很強勢）', 'ys-chat-widgets' ); ?></option>
+                <option value="off"   <?php selected( 'off', $sm ); ?>><?php echo esc_html__( '關閉 — 不強制（若你想自己用 CSS 微調外觀）', 'ys-chat-widgets' ); ?></option>
+            </select>
+            <p class="description"><?php echo esc_html__( '若浮動按鈕在前台被佈景主題染色、變形或消失，「自動」會自動偵測並強制套用你的設定顏色與尺寸；問題嚴重時可改「一律強制」。', 'ys-chat-widgets' ); ?></p>
+        </div>
     </div>
 
     <!-- Apps 管理 -->
