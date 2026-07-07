@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.0 — 2026-07-07
+
+### 新增
+- **點擊雙模式**：
+  - 直接開啟（redirect，預設）— 點擊 App 直接開啟連結。
+  - **QR Code 卡片（popup）** — 桌機點擊彈出 QR Code 卡片（App 品牌色 header、
+    掃碼提示、聯絡內容、「直接開啟」按鈕）；手機點擊仍直接開啟。
+- QR Code 由**本地 JS 生成**（qrcode-generator，MIT）：零 iframe、零外部請求，
+  與 NinjaTeam「iframe 嵌 line.me 顯示 QR」的做法不同，不會在 Apple 裝置誤觸發。
+  每一種 App（含電話 tel: / Email mailto:）都能出 QR。
+- 移轉對應：NinjaTeam `wpsaio_style`（redirect / popup）自動轉為本外掛的點擊模式。
+
 ## 1.0.0 — 2026-07-07
 
 ### 新增

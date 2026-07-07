@@ -95,13 +95,36 @@ class YSChatFrontend {
             YS_CHAT_WIDGETS_VERSION
         );
 
+        $deps = [];
+
+        // popup（QR 卡片）模式才載入本地 QR 生成器（MIT — Kazuhiko Arase）。
+        if ( 'popup' === ( $settings['mode'] ?? 'redirect' ) ) {
+            wp_enqueue_script(
+                'ys-chat-qrcode',
+                YS_CHAT_WIDGETS_PLUGIN_URL . 'assets/js/vendor/qrcode-generator.js',
+                [],
+                YS_CHAT_WIDGETS_VERSION,
+                [ 'in_footer' => true, 'strategy' => 'defer' ]
+            );
+            $deps[] = 'ys-chat-qrcode';
+        }
+
         wp_enqueue_script(
             'ys-chat-widgets',
             YS_CHAT_WIDGETS_PLUGIN_URL . 'assets/js/ys-chat-frontend.js',
-            [],
+            $deps,
             YS_CHAT_WIDGETS_VERSION,
             [ 'in_footer' => true, 'strategy' => 'defer' ]
         );
+
+        wp_localize_script( 'ys-chat-widgets', 'ysChatWidgets', [
+            'mode' => ( 'popup' === ( $settings['mode'] ?? 'redirect' ) ) ? 'popup' : 'redirect',
+            'i18n' => [
+                'scanQr'   => __( '用手機掃描 QR Code', 'ys-chat-widgets' ),
+                'openLink' => __( '直接開啟', 'ys-chat-widgets' ),
+                'close'    => __( '關閉', 'ys-chat-widgets' ),
+            ],
+        ] );
     }
 
     /**
@@ -131,7 +154,7 @@ class YSChatFrontend {
             $color
         );
         ?>
-<div id="ys-chat-widgets" class="ysch-wrap ysch-pos-<?php echo esc_attr( $position ); ?>" style="<?php echo esc_attr( $style ); ?>">
+<div id="ys-chat-widgets" class="ysch-wrap ysch-pos-<?php echo esc_attr( $position ); ?>" data-mode="<?php echo esc_attr( ( 'popup' === ( $settings['mode'] ?? 'redirect' ) ) ? 'popup' : 'redirect' ); ?>" style="<?php echo esc_attr( $style ); ?>">
     <ul class="ysch-items" role="list">
         <?php
         foreach ( (array) $settings['apps'] as $app ) {
@@ -157,6 +180,11 @@ class YSChatFrontend {
             <a class="ysch-item ysch-app-<?php echo esc_attr( $key ); ?>"
                href="<?php echo esc_url( $url ); ?>"
                <?php echo $is_external ? 'target="_blank" rel="noopener nofollow"' : ''; ?>
+               data-app="<?php echo esc_attr( $key ); ?>"
+               data-applabel="<?php echo esc_attr( ! empty( $app['title'] ) ? (string) $app['title'] : (string) $def['title'] ); ?>"
+               data-appvalue="<?php echo esc_attr( (string) $app['value'] ); ?>"
+               data-appcolor="<?php echo esc_attr( $def['color'] ); ?>"
+               data-appfg="<?php echo esc_attr( $def['icon_fg'] ); ?>"
                style="--ysch-app-color:<?php echo esc_attr( $def['color'] ); ?>;--ysch-app-fg:<?php echo esc_attr( $def['icon_fg'] ); ?>;">
                 <span class="ysch-icon" aria-hidden="true"><?php echo YSChatApps::icon( $key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
                 <span class="ysch-label"><?php echo esc_html( $label ); ?></span>

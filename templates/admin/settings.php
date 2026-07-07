@@ -152,6 +152,27 @@ $ysch_apps_defs = YSChatApps::all();
         </div>
 
         <div class="ysch-field">
+            <label><?php echo esc_html__( '點擊模式', 'ys-chat-widgets' ); ?></label>
+            <div class="ysch-radio-group">
+                <label class="ysch-radio-card">
+                    <input type="radio" name="ysch-mode" value="redirect" <?php checked( 'popup' !== ( $settings['mode'] ?? 'redirect' ) ); ?> />
+                    <span class="ysch-radio-card-body">
+                        <span class="dashicons dashicons-external" style="font-size:22px;width:22px;height:22px;color:var(--ys-adm-primary-dark);"></span>
+                        <?php echo esc_html__( '直接開啟', 'ys-chat-widgets' ); ?>
+                    </span>
+                </label>
+                <label class="ysch-radio-card">
+                    <input type="radio" name="ysch-mode" value="popup" <?php checked( 'popup' === ( $settings['mode'] ?? 'redirect' ) ); ?> />
+                    <span class="ysch-radio-card-body">
+                        <span class="dashicons dashicons-grid-view" style="font-size:22px;width:22px;height:22px;color:var(--ys-adm-primary-dark);"></span>
+                        <?php echo esc_html__( 'QR Code 卡片', 'ys-chat-widgets' ); ?>
+                    </span>
+                </label>
+            </div>
+            <p class="description"><?php echo esc_html__( 'QR Code 卡片：桌機點擊時彈出本地生成的 QR Code（零 iframe、零外部請求），手機點擊仍直接開啟。', 'ys-chat-widgets' ); ?></p>
+        </div>
+
+        <div class="ysch-field">
             <label><?php echo esc_html__( '標籤文字', 'ys-chat-widgets' ); ?></label>
             <select id="ysch-tooltip">
                 <option value="appname" <?php selected( 'appname', $settings['tooltip'] ?? 'appname' ); ?>><?php echo esc_html__( '顯示 App 名稱', 'ys-chat-widgets' ); ?></option>

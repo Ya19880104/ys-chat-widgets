@@ -43,6 +43,7 @@ class YSChatMigration {
             'show_desktop'  => 1,
             'show_mobile'   => 1,
             'tooltip'       => 'appname',
+            'mode'          => 'redirect',
             'display'       => 'all',
             'include_pages' => [],
             'exclude_pages' => [],
@@ -129,6 +130,10 @@ class YSChatMigration {
         $settings['show_desktop'] = (int) (bool) get_option( 'wpsaio_show_on_desktop', 1 );
         $settings['show_mobile']  = (int) (bool) get_option( 'wpsaio_show_on_mobile', 1 );
         $settings['tooltip']      = ( 'content' === get_option( 'wpsaio_tooltip', 'appname' ) ) ? 'content' : 'appname';
+
+        // 點擊模式：NinjaTeam wpsaio_style（redirect / popup）→ mode。
+        // 對方 popup = iframe 嵌 line.me（QR 來源）；本外掛 popup = 本地生成 QR 卡片。
+        $settings['mode'] = ( 'popup' === get_option( 'wpsaio_style', 'redirect' ) ) ? 'popup' : 'redirect';
 
         $color = (string) get_option( 'wpsaio_button_color', '' );
         if ( $color && preg_match( '/^#([0-9a-f]{3}|[0-9a-f]{6})$/i', $color ) ) {
