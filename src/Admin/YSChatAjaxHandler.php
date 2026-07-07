@@ -59,9 +59,12 @@ class YSChatAjaxHandler {
         $out      = $defaults;
 
         $out['enabled']      = ! empty( $raw['enabled'] ) ? 1 : 0;
-        $out['position']     = ( isset( $raw['position'] ) && 'left' === $raw['position'] ) ? 'left' : 'right';
+        $pos                 = isset( $raw['position'] ) ? (string) $raw['position'] : 'right';
+        $out['position']     = in_array( $pos, [ 'left', 'center', 'right' ], true ) ? $pos : 'right';
         $out['bottom']       = isset( $raw['bottom'] ) ? min( 400, max( 0, (int) $raw['bottom'] ) ) : $defaults['bottom'];
         $out['side']         = isset( $raw['side'] ) ? min( 400, max( 0, (int) $raw['side'] ) ) : $defaults['side'];
+        $out['size_outer']   = isset( $raw['size_outer'] ) ? min( 96, max( 36, (int) $raw['size_outer'] ) ) : $defaults['size_outer'];
+        $out['size_inner']   = isset( $raw['size_inner'] ) ? min( 80, max( 28, (int) $raw['size_inner'] ) ) : $defaults['size_inner'];
         $out['show_desktop'] = ! empty( $raw['show_desktop'] ) ? 1 : 0;
         $out['show_mobile']  = ! empty( $raw['show_mobile'] ) ? 1 : 0;
         $tt                  = isset( $raw['tooltip'] ) ? (string) $raw['tooltip'] : 'appname';

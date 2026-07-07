@@ -3,7 +3,7 @@
  * Plugin Name: YS CHAT Widgets
  * Plugin URI:  https://yangsheep.com.tw
  * Description: 浮動聯絡按鈕（LINE、Messenger、WhatsApp、電話、Email 等）。純錨點連結設計，不使用 iframe，不會在 iOS / Apple 裝置上誤觸發開啟 App。支援直接開啟與本地生成 QR Code 卡片雙模式。初次啟用時自動偵測並移轉 NinjaTeam Click to Chat（WP Support All-in-One）設定。
- * Version:     1.2.0
+ * Version:     1.2.1
  * Author:      YANGSHEEP DESIGN
  * Author URI:  https://yangsheep.com.tw
  * License:     GPL-2.0-or-later
@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 /* ──────────────────────────────────────────────
  * 常數定義
  * ────────────────────────────────────────────── */
-define( 'YS_CHAT_WIDGETS_VERSION', '1.2.0' );
+define( 'YS_CHAT_WIDGETS_VERSION', '1.2.1' );
 define( 'YS_CHAT_WIDGETS_PLUGIN_FILE', __FILE__ );
 define( 'YS_CHAT_WIDGETS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'YS_CHAT_WIDGETS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

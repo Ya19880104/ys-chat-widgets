@@ -211,6 +211,8 @@
             position:      $( 'input[name="ysch-position"]:checked' ).val() || 'right',
             bottom:        parseInt( $( '#ysch-bottom' ).val(), 10 ) || 0,
             side:          parseInt( $( '#ysch-side' ).val(), 10 ) || 0,
+            size_outer:    parseInt( $( '#ysch-size-outer' ).val(), 10 ) || 56,
+            size_inner:    parseInt( $( '#ysch-size-inner' ).val(), 10 ) || 46,
             button_color:  $( '#ysch-button-color' ).val() || '',
             button_icon:   $( '#ysch-button-icon' ).val() || '',
             icon_style:    $( '#ysch-icon-style' ).val() || 'contain',

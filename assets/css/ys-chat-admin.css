@@ -297,6 +297,7 @@
 
 .ysch-pos-preview-left i { left: 4px; }
 .ysch-pos-preview-right i { right: 4px; }
+.ysch-pos-preview-center i { left: 50%; transform: translateX(-50%); }
 
 /* ── App picker ───────────────────────────── */
 .ysch-app-picker {

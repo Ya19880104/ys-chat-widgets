@@ -38,6 +38,8 @@ class YSChatMigration {
             'position'      => 'right',
             'bottom'        => 30,
             'side'          => 20,
+            'size_outer'    => 56,
+            'size_inner'    => 46,
             'button_color'  => '#8fa8b8',
             'button_icon'   => '',
             'icon_style'    => 'contain',

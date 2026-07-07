@@ -244,10 +244,11 @@ class YSChatApps {
      * 明確補上 width/height 屬性 — 避免主題 CSS 未套用/被覆蓋時 SVG 無尺寸。
      * 後台 CSS 以更高優先級覆寫時仍可縮放。
      */
-    public static function icon( string $key ): string {
+    public static function icon( string $key, int $px = 24 ): string {
         $icons = self::icons();
         $svg   = $icons[ $key ] ?? $icons['custom'];
-        return (string) preg_replace( '/^<svg /', '<svg width="24" height="24" ', $svg, 1 );
+        $px    = max( 8, $px );
+        return (string) preg_replace( '/^<svg /', '<svg width="' . $px . '" height="' . $px . '" ', $svg, 1 );
     }
 
     /**
@@ -276,12 +277,14 @@ class YSChatApps {
     /**
      * 主按鈕（聊天泡泡）與關閉 icon（含明確 26px 尺寸，不依賴 CSS）
      */
-    public static function toggle_icon(): string {
-        return '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.9 2 11.7c0 2.5 1.2 4.7 3.2 6.3-.1.6-.5 2.2-1.5 3.6-.2.3.1.7.4.6 2.1-.5 3.8-1.5 4.7-2.2 1 .3 2.1.4 3.2.4 5.5 0 10-3.9 10-8.7S17.5 3 12 3z"/></svg>';
+    public static function toggle_icon( int $px = 26 ): string {
+        $px = max( 10, $px );
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="' . $px . '" height="' . $px . '" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.9 2 11.7c0 2.5 1.2 4.7 3.2 6.3-.1.6-.5 2.2-1.5 3.6-.2.3.1.7.4.6 2.1-.5 3.8-1.5 4.7-2.2 1 .3 2.1.4 3.2.4 5.5 0 10-3.9 10-8.7S17.5 3 12 3z"/></svg>';
     }
 
-    public static function close_icon(): string {
-        return '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    public static function close_icon( int $px = 26 ): string {
+        $px = max( 10, $px );
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="' . $px . '" height="' . $px . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
     }
 
     /**

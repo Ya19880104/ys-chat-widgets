@@ -73,20 +73,28 @@ $ysch_apps_defs = YSChatApps::all();
         </div>
 
         <div class="ysch-field">
-            <label><?php echo esc_html__( '位置', 'ys-chat-widgets' ); ?></label>
+            <label><?php echo esc_html__( '對齊位置', 'ys-chat-widgets' ); ?></label>
+            <?php $pos = $settings['position'] ?? 'right'; ?>
             <div class="ysch-radio-group">
                 <label class="ysch-radio-card">
-                    <input type="radio" name="ysch-position" value="left" <?php checked( 'left' === ( $settings['position'] ?? 'right' ) ); ?> />
+                    <input type="radio" name="ysch-position" value="left" <?php checked( 'left' === $pos ); ?> />
                     <span class="ysch-radio-card-body">
                         <span class="ysch-pos-preview ysch-pos-preview-left"><i></i></span>
-                        <?php echo esc_html__( '左下角', 'ys-chat-widgets' ); ?>
+                        <?php echo esc_html__( '靠左下', 'ys-chat-widgets' ); ?>
                     </span>
                 </label>
                 <label class="ysch-radio-card">
-                    <input type="radio" name="ysch-position" value="right" <?php checked( 'left' !== ( $settings['position'] ?? 'right' ) ); ?> />
+                    <input type="radio" name="ysch-position" value="center" <?php checked( 'center' === $pos ); ?> />
+                    <span class="ysch-radio-card-body">
+                        <span class="ysch-pos-preview ysch-pos-preview-center"><i></i></span>
+                        <?php echo esc_html__( '靠中下', 'ys-chat-widgets' ); ?>
+                    </span>
+                </label>
+                <label class="ysch-radio-card">
+                    <input type="radio" name="ysch-position" value="right" <?php checked( 'right' === $pos || ! in_array( $pos, [ 'left', 'center', 'right' ], true ) ); ?> />
                     <span class="ysch-radio-card-body">
                         <span class="ysch-pos-preview ysch-pos-preview-right"><i></i></span>
-                        <?php echo esc_html__( '右下角', 'ys-chat-widgets' ); ?>
+                        <?php echo esc_html__( '靠右下', 'ys-chat-widgets' ); ?>
                     </span>
                 </label>
             </div>
@@ -100,10 +108,24 @@ $ysch_apps_defs = YSChatApps::all();
             <div class="ysch-field">
                 <label for="ysch-side"><?php echo esc_html__( '距離側邊（px）', 'ys-chat-widgets' ); ?></label>
                 <input type="number" id="ysch-side" min="0" max="400" value="<?php echo esc_attr( (string) ( $settings['side'] ?? 20 ) ); ?>" />
+                <p class="description"><?php echo esc_html__( '靠中下時此項無作用。', 'ys-chat-widgets' ); ?></p>
             </div>
             <div class="ysch-field">
                 <label for="ysch-button-color"><?php echo esc_html__( '按鈕顏色', 'ys-chat-widgets' ); ?></label>
                 <input type="color" id="ysch-button-color" value="<?php echo esc_attr( (string) ( $settings['button_color'] ?? '#8fa8b8' ) ); ?>" />
+            </div>
+        </div>
+
+        <div class="ysch-field-row">
+            <div class="ysch-field">
+                <label for="ysch-size-outer"><?php echo esc_html__( '主按鈕大小 · 外（px）', 'ys-chat-widgets' ); ?></label>
+                <input type="number" id="ysch-size-outer" min="36" max="96" value="<?php echo esc_attr( (string) ( $settings['size_outer'] ?? 56 ) ); ?>" />
+                <p class="description"><?php echo esc_html__( '預設 56。', 'ys-chat-widgets' ); ?></p>
+            </div>
+            <div class="ysch-field">
+                <label for="ysch-size-inner"><?php echo esc_html__( '聯絡圖示大小 · 內（px）', 'ys-chat-widgets' ); ?></label>
+                <input type="number" id="ysch-size-inner" min="28" max="80" value="<?php echo esc_attr( (string) ( $settings['size_inner'] ?? 46 ) ); ?>" />
+                <p class="description"><?php echo esc_html__( '預設 46。', 'ys-chat-widgets' ); ?></p>
             </div>
         </div>
 

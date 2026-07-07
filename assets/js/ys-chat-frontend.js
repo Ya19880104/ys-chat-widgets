@@ -90,9 +90,11 @@
             return;
         }
 
-        // 錨定位置：與 widget 同側、疊在 toggle 上方。
-        var a      = data.anchor;
-        var isLeft = 'left' === a.side;
+        // 錨定位置：與 widget 同側（或置中）、疊在 toggle 上方。
+        var a        = data.anchor;
+        var isCenter = 'center' === a.side;
+        var isLeft   = 'left' === a.side;
+        var baseTransform = isCenter ? 'translateX(-50%) ' : '';
 
         qrCard = document.createElement( 'div' );
         qrCard.setAttribute( 'role', 'dialog' );
@@ -109,10 +111,15 @@
             zIndex: '99999',
             fontFamily: FONT_STACK,
             opacity: '0',
-            transform: 'translateY(8px) scale(0.97)',
+            transform: baseTransform + 'translateY(8px) scale(0.97)',
             transition: 'opacity 0.16s ease, transform 0.16s ease',
         } );
-        qrCard.style[ isLeft ? 'left' : 'right' ] = a.side_px + 'px';
+        if ( isCenter ) {
+            qrCard.style.left = a.center_x + 'px';
+        } else {
+            qrCard.style[ isLeft ? 'left' : 'right' ] = a.side_px + 'px';
+        }
+        qrCard.setAttribute( 'data-basetransform', baseTransform );
 
         var header = document.createElement( 'div' );
         css( header, {
@@ -211,11 +218,11 @@
         qrCard.appendChild( body );
         document.body.appendChild( qrCard );
 
-        // 入場動畫。
+        // 入場動畫（置中時保留 translateX(-50%)）。
         requestAnimationFrame( function () {
             if ( qrCard ) {
                 qrCard.style.opacity = '1';
-                qrCard.style.transform = 'translateY(0) scale(1)';
+                qrCard.style.transform = baseTransform + 'translateY(0) scale(1)';
             }
         } );
 
@@ -279,7 +286,9 @@
                 e.preventDefault();
 
                 var cs = getComputedStyle( wrap );
+                var rect = wrap.getBoundingClientRect();
                 var isLeft = wrap.classList.contains( 'ysch-pos-left' );
+                var isCenter = wrap.classList.contains( 'ysch-pos-center' );
                 openQrCard( {
                     url:   item.getAttribute( 'href' ),
                     label: item.getAttribute( 'data-applabel' ) || '',
@@ -287,8 +296,9 @@
                     color: item.getAttribute( 'data-appcolor' ) || '#8fa8b8',
                     fg:    item.getAttribute( 'data-appfg' ) || '#ffffff',
                     anchor: {
-                        side:    isLeft ? 'left' : 'right',
+                        side:    isCenter ? 'center' : ( isLeft ? 'left' : 'right' ),
                         side_px: parseInt( isLeft ? cs.left : cs.right, 10 ) || 20,
+                        center_x: rect.left + rect.width / 2,
                         bottom:  parseInt( cs.bottom, 10 ) || 30,
                         toggleH: toggle.offsetHeight || 56,
                     },
@@ -311,23 +321,25 @@
         }
     }
 
-    /** 判斷主按鈕是否被主題破壞（底色被清成透明，或尺寸被壓縮）。 */
-    function toggleLooksBroken( toggle ) {
+    /** 判斷主按鈕是否被主題破壞（底色被清成透明，或尺寸明顯小於設定值）。 */
+    function toggleLooksBroken( toggle, outer ) {
         var cs = getComputedStyle( toggle );
         var bg = cs.backgroundColor;
         var transparent = ( 'rgba(0, 0, 0, 0)' === bg || 'transparent' === bg );
         var w = parseFloat( cs.width ) || 0;
-        return transparent || w < 44;
+        return transparent || w < ( outer - 12 );
     }
 
-    /** 強制套用關鍵樣式（用 widget 上的 data 色值 — 即使用者自訂顏色）。 */
+    /** 強制套用關鍵樣式（用 widget 上的 data 色值與尺寸 — 尊重使用者設定）。 */
     function forceStyles( wrap, toggle ) {
         var color = wrap.getAttribute( 'data-color' ) || '#8fa8b8';
         var fg    = wrap.getAttribute( 'data-fg' ) || '#ffffff';
+        var outer = ( parseInt( wrap.getAttribute( 'data-outer' ), 10 ) || 56 ) + 'px';
+        var inner = ( parseInt( wrap.getAttribute( 'data-inner' ), 10 ) || 46 ) + 'px';
         setImportant( toggle, {
             'position': 'relative', 'box-sizing': 'border-box', 'display': 'flex',
             'align-items': 'center', 'justify-content': 'center',
-            'width': '56px', 'height': '56px', 'min-width': '56px',
+            'width': outer, 'height': outer, 'min-width': outer,
             'padding': '0', 'margin': '0', 'border': 'none', 'border-radius': '50%',
             'background': color, 'color': fg, 'cursor': 'pointer', 'line-height': '0',
             'box-shadow': '0 4px 14px rgba(0,0,0,0.22)'
@@ -341,7 +353,7 @@
             var icon = items[ j ].querySelector( '.ysch-icon' );
             setImportant( icon, {
                 'box-sizing': 'border-box', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center',
-                'width': '46px', 'height': '46px', 'min-width': '46px', 'border-radius': '50%',
+                'width': inner, 'height': inner, 'min-width': inner, 'border-radius': '50%',
                 'background': items[ j ].getAttribute( 'data-appcolor' ) || color,
                 'color': items[ j ].getAttribute( 'data-appfg' ) || '#ffffff', 'flex': '0 0 auto', 'line-height': '0'
             } );
@@ -351,9 +363,10 @@
     /** 自動防呆：載入後多個時點檢查，一旦偵測破壞即強制修正。 */
     function setupAutoHeal( wrap, toggle ) {
         var healed = false;
+        var outer = parseInt( wrap.getAttribute( 'data-outer' ), 10 ) || 56;
         function heal() {
             if ( healed ) { return; }
-            if ( toggleLooksBroken( toggle ) ) {
+            if ( toggleLooksBroken( toggle, outer ) ) {
                 forceStyles( wrap, toggle );
                 healed = true;
             }
