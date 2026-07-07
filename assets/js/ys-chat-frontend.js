@@ -240,9 +240,16 @@
             return;
         }
 
+        var iconOpen  = toggle.querySelector( '.ysch-toggle-open' );
+        var iconClose = toggle.querySelector( '.ysch-toggle-close' );
+
         function setOpen( open ) {
             wrap.classList.toggle( 'ysch-open', open );
             toggle.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
+            // 開/關 icon 交換由 JS 直接控制 inline opacity（inline 樣式已蓋過 CSS，
+            // 故不能依賴 CSS 的 .ysch-open 規則做交換）。
+            if ( iconOpen ) { iconOpen.style.opacity = open ? '0' : '1'; }
+            if ( iconClose ) { iconClose.style.opacity = open ? '1' : '0'; }
         }
 
         toggle.addEventListener( 'click', function () {

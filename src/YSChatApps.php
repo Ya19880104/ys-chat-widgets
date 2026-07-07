@@ -224,10 +224,14 @@ class YSChatApps {
 
     /**
      * inline SVG 圖示（GPL — 取自 NinjaTeam Click to Chat）
+     *
+     * 明確補上 width/height 屬性 — 避免主題 CSS 未套用/被覆蓋時 SVG 無尺寸。
+     * 後台 CSS 以更高優先級覆寫時仍可縮放。
      */
     public static function icon( string $key ): string {
         $icons = self::icons();
-        return $icons[ $key ] ?? $icons['custom'];
+        $svg   = $icons[ $key ] ?? $icons['custom'];
+        return (string) preg_replace( '/^<svg /', '<svg width="24" height="24" ', $svg, 1 );
     }
 
     /**
@@ -253,13 +257,32 @@ class YSChatApps {
     }
 
     /**
-     * 主按鈕（聊天泡泡）與關閉 icon
+     * 主按鈕（聊天泡泡）與關閉 icon（含明確 26px 尺寸，不依賴 CSS）
      */
     public static function toggle_icon(): string {
-        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.9 2 11.7c0 2.5 1.2 4.7 3.2 6.3-.1.6-.5 2.2-1.5 3.6-.2.3.1.7.4.6 2.1-.5 3.8-1.5 4.7-2.2 1 .3 2.1.4 3.2.4 5.5 0 10-3.9 10-8.7S17.5 3 12 3z"/></svg>';
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.9 2 11.7c0 2.5 1.2 4.7 3.2 6.3-.1.6-.5 2.2-1.5 3.6-.2.3.1.7.4.6 2.1-.5 3.8-1.5 4.7-2.2 1 .3 2.1.4 3.2.4 5.5 0 10-3.9 10-8.7S17.5 3 12 3z"/></svg>';
     }
 
     public static function close_icon(): string {
-        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    }
+
+    /**
+     * 依背景色計算對比前景色（白 / 深灰）— 供主按鈕圖示用。
+     */
+    public static function contrast_fg( string $hex ): string {
+        $hex = ltrim( trim( $hex ), '#' );
+        if ( 3 === strlen( $hex ) ) {
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+        }
+        if ( ! preg_match( '/^[0-9a-f]{6}$/i', $hex ) ) {
+            return '#ffffff';
+        }
+        $r = hexdec( substr( $hex, 0, 2 ) );
+        $g = hexdec( substr( $hex, 2, 2 ) );
+        $b = hexdec( substr( $hex, 4, 2 ) );
+        // 相對亮度（sRGB 近似）。
+        $lum = ( 0.299 * $r + 0.587 * $g + 0.114 * $b ) / 255;
+        return ( $lum > 0.62 ) ? '#1a1a1a' : '#ffffff';
     }
 }
